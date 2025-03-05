@@ -3,7 +3,27 @@ import React from 'react'
 import { ImageUp, WandSparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 function ImageUpload() {
+    const AiModelList = [
+        {
+            name: 'Gemini',
+            icon: '/gemini.png'
+        },
+        {
+            name: 'DeepSeek',
+            icon: '/deepseek.png'
+        },
+        {
+            name: 'Claude',
+            icon: '/claude.png'
+        },
+        {
+            name: 'GPT-4',
+            icon: '/gpt-4.png'
+        }
+    ];
     // 状态管理：dragActive 标记拖拽状态，file 保存选择的文件
     const [dragActive, setDragActive] = React.useState(false);
     const [file, setFile] = React.useState<File | null>(null);
@@ -15,7 +35,7 @@ function ImageUpload() {
         if (file) {
             const objectUrl = URL.createObjectURL(file);
             setPreview(objectUrl);
-            
+
             // 清理函数：组件卸载时释放URL
             return () => URL.revokeObjectURL(objectUrl);
         }
@@ -57,7 +77,7 @@ function ImageUpload() {
         <div className='mt-10'>
             <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
                 {/* 文件上传区域：支持拖拽和点击上传 */}
-                <div 
+                <div
                     className={`bg-gray-100 rounded-lg p-4 flex flex-col justify-center items-center border-2 border-dashed
                         ${dragActive ? 'border-blue-500 bg-blue-50' : ''}`}  // 拖拽时改变样式
                     onDragEnter={handleDrag}
@@ -68,9 +88,9 @@ function ImageUpload() {
                     {preview ? (
                         // 如果有预览图，显示预览
                         <div className="relative w-full aspect-video">
-                            <img 
-                                src={preview} 
-                                alt="Preview" 
+                            <img
+                                src={preview}
+                                alt="Preview"
                                 className="rounded-lg object-contain w-full h-full"
                             />
                         </div>
@@ -101,7 +121,24 @@ function ImageUpload() {
                     </div>
                 </div>
                 <div className='bg-gray-100 rounded-lg p-4'>
-                    <p className='text-lg font-bold'>Enter Description about your webpage</p>
+                    <h2 className='text-lg font-bold'>Select AI Model</h2>
+                    <Select>
+                        <SelectTrigger className="w-full focus:ring-1 focus:ring-gray-300">
+                            <SelectValue placeholder="Theme" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {AiModelList.map((model) => (
+                                <SelectItem key={model.name} value={model.name}>
+                                    <div className='flex items-center gap-2'>
+                                        <img src={model.icon} alt={model.name} className='w-4 h-4 rounded-full' />
+                                        {model.name}
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <p className='text-lg font-bold mt-3'>Enter Description about your webpage</p>
                     <Textarea
                         placeholder='write about your webpage'
                         className='mt-3 h-40'
