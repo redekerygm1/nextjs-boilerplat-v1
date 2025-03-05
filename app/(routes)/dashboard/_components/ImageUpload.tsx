@@ -1,12 +1,25 @@
 'use client'
 import React from 'react'
-import { ImageUp } from 'lucide-react'
+import { ImageUp, WandSparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
+import { Textarea } from '@/components/ui/textarea'
 function ImageUpload() {
     // 状态管理：dragActive 标记拖拽状态，file 保存选择的文件
     const [dragActive, setDragActive] = React.useState(false);
     const [file, setFile] = React.useState<File | null>(null);
+    // 添加图片预览URL状态
+    const [preview, setPreview] = React.useState<string>('');
+
+    // 当文件改变时生成预览URL
+    React.useEffect(() => {
+        if (file) {
+            const objectUrl = URL.createObjectURL(file);
+            setPreview(objectUrl);
+            
+            // 清理函数：组件卸载时释放URL
+            return () => URL.revokeObjectURL(objectUrl);
+        }
+    }, [file]);
 
     // 处理文件拖拽事件
     const handleDrag = (e: React.DragEvent) => {
@@ -52,12 +65,26 @@ function ImageUpload() {
                     onDragOver={handleDrag}
                     onDrop={handleDrop}
                 >
-                    <ImageUp className='h-10 w-10' />
-                    <h2 className='text-lg font-bold mt-3'>Upload Image</h2>
-                    {/* 显示已选文件名或上传提示 */}
-                    <p className='text-gray-500 mt-3'>
-                        {file ? `Selected: ${file.name}` : 'Drag and drop or click to upload'}
-                    </p>
+                    {preview ? (
+                        // 如果有预览图，显示预览
+                        <div className="relative w-full aspect-video">
+                            <img 
+                                src={preview} 
+                                alt="Preview" 
+                                className="rounded-lg object-contain w-full h-full"
+                            />
+                        </div>
+                    ) : (
+                        // 否则显示上传界面
+                        <>
+                            <ImageUp className='h-10 w-10' />
+                            <h2 className='text-lg font-bold mt-3'>Upload Image</h2>
+                            {/* 显示已选文件名或上传提示 */}
+                            <p className='text-gray-500 mt-3'>
+                                {file ? `Selected: ${file.name}` : 'Drag and drop or click to upload'}
+                            </p>
+                        </>
+                    )}
                     <div className='p-5 mt-3 flex justify-center items-center border-2 border-dashed rounded-lg w-full'>
                         {/* 隐藏的文件输入框 */}
                         <input
@@ -69,13 +96,20 @@ function ImageUpload() {
                         />
                         {/* 点击按钮触发文件选择 */}
                         <Button onClick={() => document.getElementById('file-upload')?.click()}>
-                            Select Image
+                            {preview ? 'Change Image' : 'Select Image'}
                         </Button>
                     </div>
                 </div>
                 <div className='bg-gray-100 rounded-lg p-4'>
-                    <p className='text-gray-500'>User input Area</p>
+                    <p className='text-lg font-bold'>Enter Description about your webpage</p>
+                    <Textarea
+                        placeholder='write about your webpage'
+                        className='mt-3 h-40'
+                    />
                 </div>
+            </div>
+            <div className='mt-10 flex justify-center'>
+                <Button><WandSparkles className='h-4 w-4 mr-2' />Generate</Button>
             </div>
         </div>
     )
